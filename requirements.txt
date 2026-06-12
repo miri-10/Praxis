@@ -1,0 +1,9 @@
+pymupdf
+chromadb
+sentence-transformers
+groq
+supabase
+python-dotenv
+fastapi
+uvicorn[standard]
+requests

@@ -1,5 +1,39 @@
-# Environment files — never commit API keys
+# ── Environment files — never commit secrets ──────────────────────────────────
 .env
 .env.*
 **/.env
 **/.env.*
+
+# ── Python cache ───────────────────────────────────────────────────────────────
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ── Logs ───────────────────────────────────────────────────────────────────────
+*.log
+backend/server.log
+backend/errors.log
+
+# ── ChromaDB vector store (large binary — not suitable for git) ────────────────
+chroma_db/
+backend/chroma_db/
+
+# ── Document storage (PDFs and extracted text — keep off git) ─────────────────
+documents/pdfs/
+documents/extracted/
+
+# ── Node / npm ─────────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+
+# ── Virtual environments ───────────────────────────────────────────────────────
+venv/
+.venv/
+env/
+.env/
+
+# ── OS junk ───────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db

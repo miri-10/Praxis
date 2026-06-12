@@ -31,6 +31,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from ai_client import ask_question
+from projects_router import router as projects_router
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 
@@ -157,6 +158,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount all projects / chats / todos / files / notifications endpoints
+app.include_router(projects_router)
 
 
 # ── Request / Response models ─────────────────────────────────────────────────
@@ -322,3 +326,143 @@ async def ask(request: Request, body: AskRequest):
             seen.add(name)
 
     return AskResponse(answer=answer, sources=sources, language=body.language)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  GRANTS ENDPOINTS
+# ══════════════════════════════════════════════════════════════════════════════
+
+class EligibilityQuiz(BaseModel):
+    """Five questions used to match a startup to the right Nepal grant."""
+    business_stage:     str   # "idea" | "early" | "growth" | "established"
+    sector:             str   # "tech" | "agriculture" | "manufacturing" | ...
+    team_size:          int   # number of people on the team
+    investment_needed:  str   # "under_1m" | "1m_5m" | "5m_25m" | "above_25m" (NPR)
+    legal_status:       str   # "sole_proprietor" | "private_company" | "cooperative" | ...
+
+
+@app.post("/grants/ask", response_model=AskResponse)
+async def grants_ask(request: Request, body: AskRequest):
+    """
+    Searches the Nepal legal document collection for grant-related content
+    and returns an AI answer. Works identically to /ask but is a dedicated
+    endpoint so the frontend can route grant questions separately.
+    """
+    if not body.question.strip():
+        raise HTTPException(status_code=400, detail="Question must not be empty.")
+
+    client_ip = request.client.host
+    if is_rate_limited(client_ip):
+        raise HTTPException(
+            status_code=429,
+            detail=f"Too many requests. Maximum {RATE_LIMIT_REQUESTS} per minute.",
+        )
+
+    if chroma_collection is None:
+        raise HTTPException(status_code=503, detail="Database not ready.")
+
+    try:
+        chunks = retrieve_relevant_chunks(body.question)
+    except Exception as e:
+        logger.error(f"grants_ask ChromaDB error: {e}")
+        raise HTTPException(status_code=503, detail="AI service temporarily unavailable.")
+
+    if not chunks:
+        return AskResponse(
+            answer="यो जानकारी मेरो कागजातमा छैन।",
+            sources=[],
+            language=body.language,
+        )
+
+    context = build_context(chunks)
+
+    try:
+        answer = ask_question(body.question, context)
+    except Exception as e:
+        logger.error(f"grants_ask Groq error: {e}")
+        raise HTTPException(status_code=503, detail="AI service temporarily unavailable.")
+
+    if answer.startswith("ERROR:"):
+        logger.error(f"grants_ask returned error: {answer}")
+        raise HTTPException(status_code=503, detail="AI service temporarily unavailable.")
+
+    seen, sources = set(), []
+    for chunk in chunks:
+        name = chunk["source"].replace(".txt", "")
+        if name not in seen:
+            sources.append(name)
+            seen.add(name)
+
+    return AskResponse(answer=answer, sources=sources, language=body.language)
+
+
+@app.post("/grants/eligible")
+async def grants_eligible(body: EligibilityQuiz):
+    """
+    Takes five startup profile answers and asks Groq to recommend the top 3
+    most suitable Nepal government grants or loans.
+
+    Returns a JSON list of grant recommendations with name, reason, and amount.
+    Does NOT use ChromaDB — the grant knowledge is baked into the prompt.
+    """
+    quiz_summary = (
+        f"- Business stage    : {body.business_stage}\n"
+        f"- Sector            : {body.sector}\n"
+        f"- Team size         : {body.team_size} people\n"
+        f"- Investment needed : NPR {body.investment_needed}\n"
+        f"- Legal status      : {body.legal_status}"
+    )
+
+    # Known Nepal grants are listed explicitly so Groq does not hallucinate
+    prompt = f"""You are an expert on Nepal government grants, startup loans, and entrepreneur funds.
+
+A startup has the following profile:
+{quiz_summary}
+
+From the list below, recommend the top 3 best-matching grants or loans for this startup.
+Explain in one sentence WHY each one fits.
+
+Available Nepal grants/funds:
+1. IEDI Startup Loan — up to NPR 2.5M, ages 18–40, manufacturing/service
+2. Youth Self Employment Fund (YSEF) — NPR 0.5–2M, any sector, under 40
+3. Women Entrepreneurship Fund — for women-led businesses, up to NPR 1.5M
+4. Business Incubation Support (FNCCI) — mentorship + seed funding, tech/innovation
+5. Startup Nepal Grant (ICT Board) — up to NPR 1M, ICT/software startups
+6. Agricultural Development Grant (MoALD) — agri-tech, farming, food processing
+7. Manufacturing Development Fund — import-substitution products, up to NPR 5M
+8. Export Promotion Fund — businesses with export potential
+9. Enterprise Development Program (EDP) — skills + micro-loans for early-stage
+
+Respond with ONLY a valid JSON array — no markdown, no explanation. Format:
+[
+  {{"name": "...", "reason": "...", "amount": "...", "eligibility_note": "..."}}
+]"""
+
+    try:
+        from groq import Groq
+        _groq = Groq(api_key=os.getenv("GROQ_API_KEY"))
+        response = _groq.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=600,
+            temperature=0.2,
+        )
+        raw = response.choices[0].message.content
+    except Exception as e:
+        logger.error(f"grants_eligible Groq error: {e}")
+        raise HTTPException(status_code=503, detail="AI service temporarily unavailable.")
+
+    # Strip markdown code fences Groq sometimes adds
+    import re
+    fenced = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", raw)
+    if fenced:
+        raw = fenced.group(1).strip()
+
+    try:
+        import json
+        grants = json.loads(raw[raw.find("["):raw.rfind("]") + 1])
+    except Exception:
+        logger.error(f"grants_eligible JSON parse error. Raw: {raw}")
+        raise HTTPException(status_code=500, detail="AI returned invalid format. Try again.")
+
+    return {"recommendations": grants, "quiz": body.model_dump()}
