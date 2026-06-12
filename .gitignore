@@ -16,9 +16,9 @@ __pycache__/
 backend/server.log
 backend/errors.log
 
-# ── ChromaDB vector store (large binary — not suitable for git) ────────────────
-chroma_db/
-backend/chroma_db/
+# ── ChromaDB vector store ─────────────────────────────────────────────────────
+# Included in repo so Railway has the embeddings without re-running ingest.
+# backend/chroma_db/  ← kept out; only root-level chroma_db/ is tracked
 
 # ── Document storage (PDFs and extracted text — keep off git) ─────────────────
 documents/pdfs/
