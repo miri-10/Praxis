@@ -466,3 +466,13 @@ Respond with ONLY a valid JSON array — no markdown, no explanation. Format:
         raise HTTPException(status_code=500, detail="AI returned invalid format. Try again.")
 
     return {"recommendations": grants, "quiz": body.model_dump()}
+
+
+# ── Entry point (for running directly with: python backend/main.py) ───────────
+# Railway uses the Procfile command instead, but this block is kept for
+# local development and as a fallback if Railway runs the file directly.
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("backend.main:app", host="0.0.0.0", port=port)
