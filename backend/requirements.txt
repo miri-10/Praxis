@@ -1,7 +1,8 @@
 pymupdf
 chromadb
 sentence-transformers
-anthropic
+groq
+supabase
 python-dotenv
 fastapi
 uvicorn
