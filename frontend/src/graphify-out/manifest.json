@@ -1,0 +1,77 @@
+{
+  "app/layout.tsx": {
+    "mtime": 1781256482.2802782,
+    "ast_hash": "c91b0d3e31a6cccdcd6d82a1932146ad",
+    "semantic_hash": "c91b0d3e31a6cccdcd6d82a1932146ad"
+  },
+  "app/page.tsx": {
+    "mtime": 1781281829.9525228,
+    "ast_hash": "26807fe1d7c4588f9cc39db08fb8c165",
+    "semantic_hash": "26807fe1d7c4588f9cc39db08fb8c165"
+  },
+  "components/FileUpload.tsx": {
+    "mtime": 1781280828.7565768,
+    "ast_hash": "670f563e75ccb69272a7500ca3db233c",
+    "semantic_hash": "670f563e75ccb69272a7500ca3db233c"
+  },
+  "components/NewProjectModal.tsx": {
+    "mtime": 1781280764.8493516,
+    "ast_hash": "84bb8e4f58fa0cdc6cba35a46e1cb80b",
+    "semantic_hash": "84bb8e4f58fa0cdc6cba35a46e1cb80b"
+  },
+  "components/ProjectDetail.tsx": {
+    "mtime": 1781280888.9140668,
+    "ast_hash": "b898d906f6fb7dcb5fa8fee382b8da74",
+    "semantic_hash": "b898d906f6fb7dcb5fa8fee382b8da74"
+  },
+  "components/ProjectsPage.tsx": {
+    "mtime": 1781280933.0564716,
+    "ast_hash": "399d0b6e7dc739bcdefdb41011a91e32",
+    "semantic_hash": "399d0b6e7dc739bcdefdb41011a91e32"
+  },
+  "components/SavedChats.tsx": {
+    "mtime": 1781280849.65067,
+    "ast_hash": "2f80f2912310a86a4a001aaba7274279",
+    "semantic_hash": "2f80f2912310a86a4a001aaba7274279"
+  },
+  "components/TodoList.tsx": {
+    "mtime": 1781280797.228117,
+    "ast_hash": "ad9e4d0ee8c3f45d7ca399a54b55d8e4",
+    "semantic_hash": "ad9e4d0ee8c3f45d7ca399a54b55d8e4"
+  },
+  "components/chat-view.tsx": {
+    "mtime": 1781282048.8596773,
+    "ast_hash": "7ec3fe62ef46d1935bf2a6c92df5a6d8",
+    "semantic_hash": "7ec3fe62ef46d1935bf2a6c92df5a6d8"
+  },
+  "components/demo.tsx": {
+    "mtime": 1781255990.0557628,
+    "ast_hash": "5eda8460599b66a1ad814df00cf00b2a",
+    "semantic_hash": "5eda8460599b66a1ad814df00cf00b2a"
+  },
+  "components/sidebar.tsx": {
+    "mtime": 1781281805.3610456,
+    "ast_hash": "c3eb2fce4619187f912a7a247994ec16",
+    "semantic_hash": "c3eb2fce4619187f912a7a247994ec16"
+  },
+  "components/ui/ai-prompt-box.tsx": {
+    "mtime": 1781256056.7248204,
+    "ast_hash": "0f0dcccba43a07d26b38479fc5fbca56",
+    "semantic_hash": "0f0dcccba43a07d26b38479fc5fbca56"
+  },
+  "components/ui/button.tsx": {
+    "mtime": 1781255836.6268198,
+    "ast_hash": "e04ce5251d6b0dd04020988126c905e9",
+    "semantic_hash": "e04ce5251d6b0dd04020988126c905e9"
+  },
+  "lib/api.js": {
+    "mtime": 1781282055.22341,
+    "ast_hash": "cd105d2dd61c90a0e623278b94ac072e",
+    "semantic_hash": "cd105d2dd61c90a0e623278b94ac072e"
+  },
+  "lib/utils.ts": {
+    "mtime": 1781255836.726688,
+    "ast_hash": "5a6fd53fdcf2be529e9cc0b718fde352",
+    "semantic_hash": "5a6fd53fdcf2be529e9cc0b718fde352"
+  }
+}

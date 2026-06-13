@@ -57,8 +57,8 @@ logger = logging.getLogger(__name__)
 # Must match the model used in ingest.py so query embeddings are compatible
 EMBED_MODEL       = "paraphrase-multilingual-MiniLM-L12-v2"
 COLLECTION_NAME   = "nepal_legal"
-TOP_K             = 2      # number of chunks to retrieve per question
-SIMILARITY_CUTOFF = 0.5    # chunks below this score are considered irrelevant
+TOP_K             = 5      # number of chunks to retrieve per question
+SIMILARITY_CUTOFF = 0.45   # chunks below this score are considered irrelevant
 
 # ── Module-level variables ────────────────────────────────────────────────────
 
@@ -300,7 +300,7 @@ async def ask(request: Request, body: AskRequest):
     context = build_context(chunks)
 
     try:
-        answer = ask_question(body.question, context)
+        answer = ask_question(body.question, context, language=body.language)
     except Exception as e:
         logger.error(f"Groq API failed for question '{body.question}': {e}")
         raise HTTPException(
@@ -317,6 +317,12 @@ async def ask(request: Request, body: AskRequest):
         )
 
     # ── 6. Build unique, clean source list ────────────────────────────────────
+    # If Groq returned the fallback message the retrieved chunks weren't
+    # actually relevant — suppress sources so the UI isn't misleading.
+    FALLBACK = "यो जानकारी मेरो कागजातमा छैन।"
+    if FALLBACK in answer:
+        return AskResponse(answer=answer, sources=[], language=body.language)
+
     seen    = set()
     sources = []
     for chunk in chunks:
@@ -377,7 +383,7 @@ async def grants_ask(request: Request, body: AskRequest):
     context = build_context(chunks)
 
     try:
-        answer = ask_question(body.question, context)
+        answer = ask_question(body.question, context, language=body.language)
     except Exception as e:
         logger.error(f"grants_ask Groq error: {e}")
         raise HTTPException(status_code=503, detail="AI service temporarily unavailable.")
@@ -385,6 +391,10 @@ async def grants_ask(request: Request, body: AskRequest):
     if answer.startswith("ERROR:"):
         logger.error(f"grants_ask returned error: {answer}")
         raise HTTPException(status_code=503, detail="AI service temporarily unavailable.")
+
+    FALLBACK = "यो जानकारी मेरो कागजातमा छैन।"
+    if FALLBACK in answer:
+        return AskResponse(answer=answer, sources=[], language=body.language)
 
     seen, sources = set(), []
     for chunk in chunks:

@@ -26,22 +26,31 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
 FAST_MODEL    = "llama-3.1-8b-instant"
 QUALITY_MODEL = "llama-3.3-70b-versatile"
 
-# ── System prompt ─────────────────────────────────────────────────────────────
+# ── System prompt (built per-request so language is explicit) ─────────────────
 
-# This tells the AI how to behave for every question it receives.
-# It is sent once as a "system" message before the user's question.
-SYSTEM_PROMPT = """You are a legal assistant for Nepal startups.
-Answer using ONLY the provided document excerpts.
-Always cite which document your answer comes from.
-Answer in the same language the user asked in — if they ask in Nepali, answer in Nepali.
-If the answer is not in the documents, say:
-'यो जानकारी मेरो कागजातमा छैन।'
-Keep answers under 200 words."""
+def _build_prompt(language: str) -> str:
+    lang = (
+        "You MUST respond entirely in Nepali (Devanagari script). Do not use English."
+        if language == "ne"
+        else "You MUST respond entirely in English. Do not use Nepali."
+    )
+    return f"""You are a legal assistant for Nepal startups.
+
+{lang}
+
+Instructions:
+- Answer using ONLY the document excerpts provided below.
+- Cite the source naturally in your prose (e.g. "According to the Private Firms Registration Act, 2014...").
+- Do NOT copy or repeat the [Excerpt N — ...] header lines in your answer.
+- Do NOT repeat the same bullet point or sentence more than once.
+- Be concise and clear. Keep the answer under 250 words.
+- If the answer cannot be found in the excerpts, respond with exactly:
+  यो जानकारी मेरो कागजातमा छैन।"""
 
 
 # ── Main function ─────────────────────────────────────────────────────────────
 
-def ask_question(question: str, context: str, model: str = FAST_MODEL) -> str:
+def ask_question(question: str, context: str, language: str = "en", model: str = FAST_MODEL) -> str:
     """
     Sends a legal question to Groq along with relevant document excerpts.
 
@@ -86,7 +95,7 @@ Question: {question}"""
             model=model,
             messages=[
                 # System message sets the AI's behavior rules
-                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "system", "content": _build_prompt(language)},
                 # User message contains the documents + question
                 {"role": "user",   "content": user_message},
             ],

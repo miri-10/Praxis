@@ -1,0 +1,227 @@
+{
+  "communities": {
+    "0": [
+      "components_todolist",
+      "components_todolist_todo",
+      "components_todolist_todolist",
+      "components_todolist_todolistprops",
+      "lib_api",
+      "lib_api_apifetch",
+      "lib_api_createproject",
+      "lib_api_createtodo",
+      "lib_api_deletechat",
+      "lib_api_deletefile",
+      "lib_api_deleteproject",
+      "lib_api_deletetodo",
+      "lib_api_generatetodos",
+      "lib_api_getnotifications",
+      "lib_api_getproject",
+      "lib_api_getsavedchats",
+      "lib_api_gettodos",
+      "lib_api_getunreadcount",
+      "lib_api_listfiles",
+      "lib_api_listprojects",
+      "lib_api_marknotificationread",
+      "lib_api_savechat",
+      "lib_api_updateproject",
+      "lib_api_updatetodo",
+      "lib_api_uploadfile"
+    ],
+    "1": [
+      "ui_ai_prompt_box",
+      "ui_ai_prompt_box_button",
+      "ui_ai_prompt_box_buttonprops",
+      "ui_ai_prompt_box_customdivider",
+      "ui_ai_prompt_box_dialogcontent",
+      "ui_ai_prompt_box_dialogoverlay",
+      "ui_ai_prompt_box_dialogtitle",
+      "ui_ai_prompt_box_imageviewdialog",
+      "ui_ai_prompt_box_imageviewdialogprops",
+      "ui_ai_prompt_box_promptinput",
+      "ui_ai_prompt_box_promptinputactionprops",
+      "ui_ai_prompt_box_promptinputactionsprops",
+      "ui_ai_prompt_box_promptinputboxprops",
+      "ui_ai_prompt_box_promptinputcontext",
+      "ui_ai_prompt_box_promptinputcontexttype",
+      "ui_ai_prompt_box_promptinputprops",
+      "ui_ai_prompt_box_promptinputtextareaprops",
+      "ui_ai_prompt_box_textarea",
+      "ui_ai_prompt_box_textareaprops",
+      "ui_ai_prompt_box_tooltipcontent",
+      "ui_ai_prompt_box_voicerecorderprops"
+    ],
+    "2": [
+      "app_page",
+      "app_page_home",
+      "components_projectdetail",
+      "components_projectdetail_grant_colors",
+      "components_projectdetail_grant_labels",
+      "components_projectdetail_project",
+      "components_projectdetail_projectdetail",
+      "components_projectdetail_projectdetailprops",
+      "components_projectdetail_status_options",
+      "components_projectdetail_tabid",
+      "components_projectdetail_tabs",
+      "components_savedchats",
+      "components_savedchats_formatdate",
+      "components_savedchats_savedchat",
+      "components_savedchats_savedchats",
+      "components_savedchats_savedchatsprops"
+    ],
+    "3": [
+      "components_newprojectmodal",
+      "components_newprojectmodal_grant_types",
+      "components_newprojectmodal_newprojectmodal",
+      "components_newprojectmodal_newprojectmodalprops",
+      "components_projectspage",
+      "components_projectspage_formatdate",
+      "components_projectspage_grant_colors",
+      "components_projectspage_grant_labels",
+      "components_projectspage_project",
+      "components_projectspage_projectspage",
+      "components_projectspage_projectspageprops",
+      "components_projectspage_projectwithprogress",
+      "components_projectspage_skeletoncard",
+      "components_projectspage_status_colors",
+      "components_projectspage_status_labels"
+    ],
+    "4": [
+      "components_chat_view",
+      "components_chat_view_assistantmessage",
+      "components_chat_view_chatview",
+      "components_chat_view_chatviewprops",
+      "components_chat_view_inputbox",
+      "components_chat_view_inputboxprops",
+      "components_chat_view_message",
+      "components_chat_view_suggestions",
+      "components_chat_view_thinkingdots",
+      "components_chat_view_usermessage"
+    ],
+    "5": [
+      "components_fileupload",
+      "components_fileupload_accept",
+      "components_fileupload_fileupload",
+      "components_fileupload_fileuploadprops",
+      "components_fileupload_formatbytes",
+      "components_fileupload_formatdate",
+      "components_fileupload_projectfile"
+    ],
+    "6": [
+      "components_sidebar",
+      "components_sidebar_cn",
+      "components_sidebar_navitem",
+      "components_sidebar_navitemprops",
+      "components_sidebar_sidebar",
+      "components_sidebar_sidebarprops"
+    ],
+    "7": [
+      "ui_ai_prompt_box_cn",
+      "ui_ai_prompt_box_promptinputaction",
+      "ui_ai_prompt_box_promptinputactions",
+      "ui_ai_prompt_box_promptinputtextarea",
+      "ui_ai_prompt_box_usepromptinput",
+      "ui_ai_prompt_box_voicerecorder"
+    ],
+    "8": [
+      "app_layout",
+      "app_layout_geistmono",
+      "app_layout_geistsans",
+      "app_layout_metadata",
+      "app_layout_rootlayout"
+    ],
+    "9": [
+      "lib_utils",
+      "lib_utils_cn",
+      "ui_button",
+      "ui_button_button",
+      "ui_button_buttonvariants"
+    ],
+    "10": [
+      "components_demo",
+      "components_demo_demoone",
+      "ui_ai_prompt_box_promptinputbox"
+    ]
+  },
+  "cohesion": {
+    "0": 0.15666666666666668,
+    "1": 0.09523809523809523,
+    "2": 0.14166666666666666,
+    "3": 0.1523809523809524,
+    "4": 0.2,
+    "5": 0.2857142857142857,
+    "6": 0.4666666666666667,
+    "7": 0.3333333333333333,
+    "8": 0.4,
+    "9": 0.7,
+    "10": 0.6666666666666666
+  },
+  "gods": [
+    {
+      "id": "lib_api_apifetch",
+      "label": "apiFetch()",
+      "degree": 20
+    },
+    {
+      "id": "ui_ai_prompt_box_cn",
+      "label": "cn()",
+      "degree": 4
+    },
+    {
+      "id": "lib_api_gettodos",
+      "label": "getTodos()",
+      "degree": 4
+    },
+    {
+      "id": "components_sidebar_cn",
+      "label": "cn()",
+      "degree": 3
+    },
+    {
+      "id": "components_sidebar_sidebar",
+      "label": "Sidebar()",
+      "degree": 3
+    },
+    {
+      "id": "ui_ai_prompt_box_usepromptinput",
+      "label": "usePromptInput()",
+      "degree": 3
+    },
+    {
+      "id": "ui_ai_prompt_box_promptinputtextarea",
+      "label": "PromptInputTextarea()",
+      "degree": 3
+    },
+    {
+      "id": "ui_button_button",
+      "label": "Button()",
+      "degree": 3
+    },
+    {
+      "id": "lib_api_createproject",
+      "label": "createProject()",
+      "degree": 3
+    },
+    {
+      "id": "lib_api_listprojects",
+      "label": "listProjects()",
+      "degree": 3
+    }
+  ],
+  "surprises": [
+    {
+      "source": "Button()",
+      "target": "cn()",
+      "source_files": [
+        "components/ui/button.tsx",
+        "lib/utils.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories"
+    }
+  ],
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
+}
