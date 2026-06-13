@@ -3,8 +3,9 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Scale, ArrowUp, Square, Copy, ThumbsUp, ThumbsDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import type { Message } from "@/lib/chat-store";
 
-const API = "http://localhost:8000";
+const API = "https://web-production-27a7b.up.railway.app";
 
 const GRADIENT =
   "radial-gradient(125% 125% at 50% 101%, rgba(245,87,2,1) 10.5%, rgba(245,120,2,1) 16%, rgba(245,140,2,1) 17.5%, rgba(245,170,100,1) 25%, rgba(238,174,202,1) 40%, rgba(202,179,214,1) 65%, rgba(148,201,233,1) 100%)";
@@ -15,13 +16,6 @@ const SUGGESTIONS = [
   "Explain the Industrial Business Act 2076",
   "Consumer Protection Act 2075 — key rights",
 ];
-
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  sources?: string[];
-}
 
 // ── Input box ──────────────────────────────────────────────────────────────────
 
@@ -177,16 +171,25 @@ const ThinkingDots: React.FC = () => (
 // ── Main ChatView ──────────────────────────────────────────────────────────────
 
 interface ChatViewProps {
-  section: string;
-  chatTitle: string;
+  chatId: string;
+  initialMessages: Message[];
+  onMessagesChange: (messages: Message[]) => void;
 }
 
-export const ChatView: React.FC<ChatViewProps> = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
+export const ChatView: React.FC<ChatViewProps> = ({ chatId, initialMessages, onMessagesChange }) => {
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput]       = useState("");
   const [isLoading, setLoading] = useState(false);
   const bottomRef               = useRef<HTMLDivElement>(null);
   const hasMessages             = messages.length > 0;
+
+  // Reset when switching to a different chat
+  useEffect(() => {
+    setMessages(initialMessages);
+    setInput("");
+    setLoading(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -200,7 +203,10 @@ export const ChatView: React.FC<ChatViewProps> = () => {
       const q = text.trim();
       if (!q || isLoading) return;
 
-      setMessages((prev) => [...prev, { id: `u-${Date.now()}`, role: "user", content: q }]);
+      const userMsg: Message = { id: `u-${Date.now()}`, role: "user", content: q };
+      const next = [...messages, userMsg];
+      setMessages(next);
+      onMessagesChange(next);
       setInput("");
       setLoading(true);
 
@@ -211,35 +217,39 @@ export const ChatView: React.FC<ChatViewProps> = () => {
           body: JSON.stringify({ question: q, language: detectLang(q) }),
         });
         const data = await res.json();
-
         if (!res.ok) throw new Error(data?.detail || `HTTP ${res.status}`);
 
-        setMessages((prev) => [
-          ...prev,
-          { id: `a-${Date.now()}`, role: "assistant", content: data.answer, sources: data.sources ?? [] },
-        ]);
+        const assistantMsg: Message = {
+          id: `a-${Date.now()}`,
+          role: "assistant",
+          content: data.answer,
+          sources: data.sources ?? [],
+        };
+        const withAnswer = [...next, assistantMsg];
+        setMessages(withAnswer);
+        onMessagesChange(withAnswer);
       } catch (err) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `a-${Date.now()}`,
-            role: "assistant",
-            content:
-              err instanceof Error && err.message.includes("fetch")
-                ? "⚠️ Could not reach the server. Make sure the backend is running."
-                : `⚠️ ${err instanceof Error ? err.message : "Unexpected error. Please try again."}`,
-          },
-        ]);
+        const errMsg: Message = {
+          id: `a-${Date.now()}`,
+          role: "assistant",
+          content:
+            err instanceof Error && err.message.includes("fetch")
+              ? "⚠️ Could not reach the server. Make sure the backend is running."
+              : `⚠️ ${err instanceof Error ? err.message : "Unexpected error. Please try again."}`,
+        };
+        const withErr = [...next, errMsg];
+        setMessages(withErr);
+        onMessagesChange(withErr);
       } finally {
         setLoading(false);
       }
     },
-    [isLoading]
+    [isLoading, messages, onMessagesChange]
   );
 
   return (
     <div className="relative flex-1 flex flex-col h-full overflow-hidden">
-      {/* ── Background: gradient fades to black when chatting ── */}
+      {/* Background: gradient fades to black when chatting */}
       <div
         className="absolute inset-0 pointer-events-none transition-opacity duration-700"
         style={{ opacity: hasMessages ? 0 : 1, background: GRADIENT }}
@@ -249,11 +259,9 @@ export const ChatView: React.FC<ChatViewProps> = () => {
         style={{ opacity: hasMessages ? 1 : 0 }}
       />
 
-      {/* ── Content ── */}
       <div className="relative z-10 flex flex-col h-full">
         <AnimatePresence mode="wait">
           {!hasMessages ? (
-            /* ── Empty state: everything centered ── */
             <motion.div
               key="empty"
               className="flex-1 flex flex-col items-center justify-center px-4 pb-6"
@@ -262,7 +270,6 @@ export const ChatView: React.FC<ChatViewProps> = () => {
               exit={{ opacity: 0, y: -16, transition: { duration: 0.25 } }}
             >
               <div className="w-full max-w-[560px] flex flex-col items-center gap-7">
-                {/* Logo */}
                 <div className="flex flex-col items-center gap-3">
                   <div className="w-14 h-14 rounded-2xl bg-black/20 backdrop-blur-sm border border-black/10 flex items-center justify-center shadow-xl">
                     <Scale className="w-7 h-7 text-white drop-shadow" />
@@ -277,7 +284,6 @@ export const ChatView: React.FC<ChatViewProps> = () => {
                   </div>
                 </div>
 
-                {/* Input centered */}
                 <div className="w-full">
                   <InputBox
                     value={input}
@@ -288,7 +294,6 @@ export const ChatView: React.FC<ChatViewProps> = () => {
                   />
                 </div>
 
-                {/* Suggestion chips */}
                 <div className="grid grid-cols-2 gap-2 w-full">
                   {SUGGESTIONS.map((s) => (
                     <button
@@ -303,7 +308,6 @@ export const ChatView: React.FC<ChatViewProps> = () => {
               </div>
             </motion.div>
           ) : (
-            /* ── Chat state: messages + input at bottom ── */
             <motion.div
               key="chat"
               className="flex flex-col flex-1 min-h-0"
@@ -311,7 +315,6 @@ export const ChatView: React.FC<ChatViewProps> = () => {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.35 }}
             >
-              {/* Messages */}
               <div className="flex-1 overflow-y-auto min-h-0 px-4 py-6">
                 <div className="max-w-2xl mx-auto flex flex-col gap-6">
                   {messages.map((msg) =>
@@ -326,7 +329,6 @@ export const ChatView: React.FC<ChatViewProps> = () => {
                 </div>
               </div>
 
-              {/* Input at bottom */}
               <div className="flex-shrink-0 px-4 pb-5 pt-2 border-t border-white/5">
                 <div className="max-w-2xl mx-auto flex flex-col gap-2">
                   <InputBox

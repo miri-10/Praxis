@@ -1,4 +1,4 @@
-const BASE = "http://localhost:8000";
+const BASE = "https://web-production-27a7b.up.railway.app";
 
 async function apiFetch(path, options = {}) {
   const isFormData = options.body instanceof FormData;
