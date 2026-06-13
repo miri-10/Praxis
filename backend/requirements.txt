@@ -1,6 +1,13 @@
+# Use the CPU-only PyTorch wheels (the default Linux torch is the huge CUDA build,
+# which bloats the image and memory and tends to OOM on small instances).
+--extra-index-url https://download.pytorch.org/whl/cpu
+
 pymupdf
-chromadb
-sentence-transformers
+# Pin chromadb to the version that built backend/chroma_db — loading the
+# persisted index with a mismatched version can crash natively at startup.
+chromadb==1.5.9
+sentence-transformers==5.5.1
+torch==2.12.0+cpu
 groq
 supabase
 python-dotenv

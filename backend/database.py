@@ -28,11 +28,15 @@ CREATE TABLE projects (
   name        TEXT        NOT NULL,
   grant_type  TEXT,
   description TEXT,
+  website     TEXT,
   status      TEXT        DEFAULT 'active'
               CHECK (status IN ('active', 'submitted', 'approved', 'rejected')),
   created_at  TIMESTAMPTZ DEFAULT NOW(),
   updated_at  TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- If the projects table already exists, add the website column with:
+--   ALTER TABLE projects ADD COLUMN IF NOT EXISTS website TEXT;
 
 -- Auto-update updated_at on every row change
 CREATE OR REPLACE FUNCTION update_updated_at()

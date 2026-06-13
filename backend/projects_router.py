@@ -68,6 +68,7 @@ class ProjectCreate(BaseModel):
     name: str
     grant_type:  Optional[str] = None
     description: Optional[str] = None
+    website:     Optional[str] = None   # the user's company website
     user_id:     Optional[str] = None   # comes from auth JWT in production
 
 
@@ -76,6 +77,7 @@ class ProjectUpdate(BaseModel):
     status:      Optional[str] = None   # active | submitted | approved | rejected
     description: Optional[str] = None
     grant_type:  Optional[str] = None
+    website:     Optional[str] = None
 
 
 class ChatCreate(BaseModel):
@@ -158,6 +160,7 @@ async def create_project(body: ProjectCreate):
             "name":        body.name,
             "grant_type":  body.grant_type,
             "description": body.description,
+            "website":     body.website,
             "user_id":     body.user_id,
         }
         # Remove None values so Supabase uses column defaults
