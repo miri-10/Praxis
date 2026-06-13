@@ -90,7 +90,7 @@ export const TodoList: React.FC<TodoListProps> = ({ projectId }) => {
           </div>
           <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-orange-400 to-pink-400 transition-all duration-500"
+              className="h-full rounded-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-500"
               style={{ width: `${pct}%` }}
             />
           </div>
@@ -114,12 +114,12 @@ export const TodoList: React.FC<TodoListProps> = ({ projectId }) => {
             <button
               onClick={() => toggleTodo(todo)}
               disabled={togglingId === todo.id}
-              className="flex-shrink-0 mt-0.5 text-white/40 hover:text-orange-400 transition-colors disabled:opacity-50"
+              className="flex-shrink-0 mt-0.5 text-white/40 hover:text-violet-400 transition-colors disabled:opacity-50"
             >
               {togglingId === todo.id ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : todo.is_completed ? (
-                <CheckSquare className="w-4 h-4 text-orange-400" />
+                <CheckSquare className="w-4 h-4 text-violet-400" />
               ) : (
                 <Square className="w-4 h-4" />
               )}
@@ -145,7 +145,7 @@ export const TodoList: React.FC<TodoListProps> = ({ projectId }) => {
           onChange={(e) => setNewTask(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleAdd()}
           placeholder="Add a document or task…"
-          className="flex-1 px-3 py-2 rounded-xl bg-white/8 border border-white/10 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-orange-400/50 transition-all"
+          className="flex-1 px-3 py-2 rounded-xl bg-white/8 border border-white/10 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-violet-400/50 transition-all"
         />
         <button
           onClick={handleAdd}

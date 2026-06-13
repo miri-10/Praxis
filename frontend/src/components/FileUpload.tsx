@@ -103,7 +103,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ projectId }) => {
         onClick={() => inputRef.current?.click()}
         className={`relative flex flex-col items-center justify-center gap-3 p-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-200 ${
           dragOver
-            ? "border-orange-400/60 bg-orange-400/8"
+            ? "border-violet-400/60 bg-violet-400/8"
             : "border-white/15 bg-white/4 hover:border-white/25 hover:bg-white/6"
         }`}
       >
@@ -115,9 +115,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({ projectId }) => {
           onChange={(e) => { if (e.target.files?.[0]) processFile(e.target.files[0]); e.target.value = ""; }}
         />
         {uploading ? (
-          <Loader2 className="w-8 h-8 text-orange-400 animate-spin" />
+          <Loader2 className="w-8 h-8 text-violet-400 animate-spin" />
         ) : (
-          <Upload className={`w-8 h-8 transition-colors ${dragOver ? "text-orange-400" : "text-white/30"}`} />
+          <Upload className={`w-8 h-8 transition-colors ${dragOver ? "text-violet-400" : "text-white/30"}`} />
         )}
         <div className="text-center">
           <p className="text-white/70 text-sm font-medium">

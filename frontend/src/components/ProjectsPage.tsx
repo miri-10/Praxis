@@ -102,14 +102,14 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({ onSelectProject }) =
   return (
     <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
       {/* ── Header ── */}
-      <header className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-black/20 backdrop-blur-md flex-shrink-0">
+      <header className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#16171a] flex-shrink-0">
         <div>
           <h1 className="text-white font-semibold text-base">My Projects</h1>
           <p className="text-white/40 text-xs">{projects.length} grant application{projects.length !== 1 ? "s" : ""}</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-400 hover:to-pink-400 text-white text-sm font-semibold transition-all active:scale-95"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-400 hover:to-blue-400 text-white text-sm font-semibold transition-all active:scale-95"
         >
           <Plus className="w-4 h-4" />
           New Project
@@ -134,7 +134,7 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({ onSelectProject }) =
             </div>
             <button
               onClick={() => setShowModal(true)}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-400 hover:to-pink-400 text-white text-sm font-semibold transition-all active:scale-95"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-400 hover:to-blue-400 text-white text-sm font-semibold transition-all active:scale-95"
             >
               <Plus className="w-4 h-4" />
               Start your first grant application
@@ -180,7 +180,7 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({ onSelectProject }) =
                       </div>
                       <div className="h-1 rounded-full bg-white/10 overflow-hidden">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-orange-400 to-pink-400 transition-all"
+                          className="h-full rounded-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all"
                           style={{ width: `${pct}%` }}
                         />
                       </div>

@@ -5,10 +5,11 @@ import { Sidebar }       from "@/components/sidebar";
 import { ChatView }      from "@/components/chat-view";
 import { ProjectsPage }  from "@/components/ProjectsPage";
 import { ProjectDetail } from "@/components/ProjectDetail";
+import { GrantsPage }    from "@/components/GrantsPage";
 import { loadChats, persistChats, newChat, type Chat, type Message } from "@/lib/chat-store";
 
 const GRADIENT =
-  "radial-gradient(125% 125% at 50% 10%, #2a2a2e 0%, #1a1a1d 35%, #0d0d0f 65%, #000000 100%)";
+  "radial-gradient(120% 120% at 50% 50%, #101117 0%, #0a0a0d 55%, #070709 100%)";
 
 export default function Home() {
   const [section,     setSection]     = useState("chat");
@@ -90,6 +91,9 @@ export default function Home() {
       return projectId
         ? <ProjectDetail projectId={projectId} onBack={() => setProjectId(null)} />
         : <ProjectsPage onSelectProject={setProjectId} />;
+    }
+    if (section === "grants") {
+      return <GrantsPage />;
     }
     if (activeChat) {
       return (

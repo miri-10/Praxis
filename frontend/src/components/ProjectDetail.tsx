@@ -86,7 +86,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ projectId, onBack 
     return (
       <div className="flex-1 flex flex-col items-center justify-center gap-4">
         <p className="text-white/50">Project not found.</p>
-        <button onClick={onBack} className="text-orange-400 text-sm hover:underline">Go back</button>
+        <button onClick={onBack} className="text-violet-400 text-sm hover:underline">Go back</button>
       </div>
     );
   }
@@ -97,7 +97,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ projectId, onBack 
   return (
     <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
       {/* ── Top bar ── */}
-      <header className="flex-shrink-0 border-b border-white/10 bg-black/20 backdrop-blur-md">
+      <header className="flex-shrink-0 border-b border-white/10 bg-[#16171a]">
         <div className="flex items-center gap-3 px-5 py-3.5">
           <button
             onClick={onBack}
@@ -123,7 +123,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ projectId, onBack 
               value={project.status}
               onChange={(e) => handleStatusChange(e.target.value)}
               disabled={updatingStatus}
-              className={`appearance-none px-3 py-1.5 rounded-xl bg-white/8 border border-white/12 text-sm font-medium focus:outline-none focus:border-orange-400/50 disabled:opacity-50 cursor-pointer transition-all pr-7 ${statusObj.color}`}
+              className={`appearance-none px-3 py-1.5 rounded-xl bg-white/8 border border-white/12 text-sm font-medium focus:outline-none focus:border-violet-400/50 disabled:opacity-50 cursor-pointer transition-all pr-7 ${statusObj.color}`}
               style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff50' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center", backgroundSize: "14px" }}
             >
               {STATUS_OPTIONS.map((s) => (
@@ -141,7 +141,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ projectId, onBack 
               onClick={() => setTab(tab.id)}
               className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-all ${
                 activeTab === tab.id
-                  ? "border-orange-400 text-orange-400"
+                  ? "border-violet-400 text-violet-400"
                   : "border-transparent text-white/45 hover:text-white/70"
               }`}
             >

@@ -7,8 +7,6 @@ import {
   Trash2, LogIn, LogOut,
 } from "lucide-react";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { GlassFilter } from "@/components/ui/liquid-glass";
-import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import type { Chat } from "@/lib/chat-store";
 
 const cn = (...cls: (string | undefined | null | false)[]) => cls.filter(Boolean).join(" ");
@@ -42,7 +40,7 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, active, badge, onClick }
     </span>
     <span className="flex-1 text-left truncate">{label}</span>
     {badge !== undefined && badge > 0 && (
-      <span className="flex-shrink-0 bg-orange-500/80 text-white text-xs px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
+      <span className="flex-shrink-0 bg-violet-500/80 text-white text-xs px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
         {badge}
       </span>
     )}
@@ -85,46 +83,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <aside
       className={cn(
-        "relative flex flex-col h-full border-r border-white/10 overflow-hidden transition-all duration-300 flex-shrink-0",
-        collapsed ? "w-[60px]" : "w-[260px]"
+        "relative flex flex-col h-full bg-[#0e0f13] overflow-hidden transition-all duration-300 flex-shrink-0",
+        collapsed ? "w-[60px]" : "w-[300px]"
       )}
     >
-      {/* Liquid-glass distortion filter (renders nothing visible) */}
-      <GlassFilter />
-
-      {/* Liquid-glass layers — frosted/refracted panel behind the content */}
-      <div
-        aria-hidden
-        className="absolute inset-0 z-0 pointer-events-none"
-        style={{
-          backdropFilter: "blur(3px)",
-          WebkitBackdropFilter: "blur(3px)",
-          filter: "url(#glass-distortion)",
-          isolation: "isolate",
-        }}
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 z-0 pointer-events-none"
-        style={{ background: "rgba(255, 255, 255, 0.1)" }}
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 z-0 pointer-events-none"
-        style={{
-          boxShadow:
-            "inset 2px 2px 1px 0 rgba(255, 255, 255, 0.4), inset -1px -1px 1px 1px rgba(255, 255, 255, 0.2)",
-        }}
-      />
-
-      {/* Sidebar content (unchanged) */}
+      {/* Sidebar content */}
       <div className="relative z-30 flex flex-col h-full min-h-0">
       {/* Logo */}
-      <div className="flex items-center justify-between px-3 py-4 border-b border-white/8 flex-shrink-0">
+      <div className="flex items-center justify-between px-3 py-4 flex-shrink-0">
         {!collapsed ? (
           <>
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center flex-shrink-0">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
                 <Rocket className="w-4 h-4 text-white" />
               </div>
               <div className="leading-tight">
@@ -142,7 +112,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           </>
         ) : (
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center mx-auto">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center mx-auto">
             <Rocket className="w-4 h-4 text-white" />
           </div>
         )}
@@ -160,19 +130,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* New Chat */}
       <div className={cn("px-2 pt-3 flex-shrink-0", collapsed && "flex justify-center")}>
-        <LiquidButton
+        <button
           onClick={onNewChat}
-          size="default"
           className={cn(
-            "rounded-xl text-white text-sm font-medium",
-            collapsed ? "w-auto p-2" : "w-full px-3 py-2"
+            "flex items-center justify-center gap-2.5 rounded-lg bg-[#26272b] hover:bg-[#303137] border border-white/10 text-white text-sm font-medium transition-colors",
+            collapsed ? "p-2" : "w-full px-3 py-2.5"
           )}
         >
-          <span className="flex items-center gap-2.5">
-            <Plus className="w-4 h-4 flex-shrink-0" />
-            {!collapsed && <span>New Chat</span>}
-          </span>
-        </LiquidButton>
+          <Plus className="w-4 h-4 flex-shrink-0" />
+          {!collapsed && <span>New Chat</span>}
+        </button>
       </div>
 
       {/* Nav */}
@@ -197,7 +164,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               >
                 {item.icon}
                 {item.badge !== undefined && item.badge > 0 && (
-                  <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-orange-500 rounded-full" />
+                  <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-violet-500 rounded-full" />
                 )}
               </button>
             ))}
@@ -269,14 +236,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {collapsed && <div className="flex-1" />}
 
       {/* User profile */}
-      <div className={cn("border-t border-white/8 p-2 flex-shrink-0", collapsed && "flex justify-center")}>
+      <div className={cn("p-2 flex-shrink-0", collapsed && "flex justify-center")}>
         {session ? (
           <div className={cn("flex items-center gap-3 rounded-xl group", collapsed ? "p-2 justify-center" : "px-3 py-2")}>
             {userImage ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={userImage} alt={userName} className="w-7 h-7 rounded-full flex-shrink-0 object-cover" />
             ) : (
-              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-orange-400 to-pink-400 flex items-center justify-center flex-shrink-0">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
                 <span className="text-white text-xs font-bold">{initials}</span>
               </div>
             )}

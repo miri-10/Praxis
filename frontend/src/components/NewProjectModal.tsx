@@ -19,6 +19,7 @@ interface NewProjectModalProps {
 export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onCreated }) => {
   const [name, setName]           = useState("");
   const [grantType, setGrantType] = useState("general");
+  const [website, setWebsite]     = useState("");
   const [description, setDesc]    = useState("");
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState("");
@@ -34,6 +35,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onCre
       const project = await createProject({
         name:        name.trim(),
         grant_type:  grantType,
+        website:     website.trim() || null,
         description: description.trim() || null,
       });
 
@@ -55,14 +57,14 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onCre
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={!loading ? onClose : undefined} />
+      <div className="absolute inset-0 bg-black/60" onClick={!loading ? onClose : undefined} />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md rounded-2xl border border-white/15 bg-black/70 backdrop-blur-2xl shadow-2xl p-6 flex flex-col gap-5">
+      <div className="relative w-full max-w-md rounded-md border border-white/10 bg-[#1c1d21] shadow-2xl p-6 flex flex-col gap-5">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
               <FolderPlus className="w-4 h-4 text-white" />
             </div>
             <div>
@@ -82,7 +84,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onCre
           {/* Project Name */}
           <div className="flex flex-col gap-1.5">
             <label className="text-white/60 text-xs font-medium uppercase tracking-wider">
-              Project Name <span className="text-orange-400">*</span>
+              Project Name <span className="text-violet-400">*</span>
             </label>
             <input
               type="text"
@@ -90,7 +92,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onCre
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. IEDI Application 2082"
               disabled={loading}
-              className="w-full px-3 py-2.5 rounded-xl bg-white/8 border border-white/12 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-orange-400/60 focus:bg-white/10 disabled:opacity-50 transition-all"
+              className="w-full px-3 py-2.5 rounded-xl bg-white/8 border border-white/12 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-violet-400/60 focus:bg-white/10 disabled:opacity-50 transition-all"
             />
           </div>
 
@@ -103,7 +105,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onCre
               value={grantType}
               onChange={(e) => setGrantType(e.target.value)}
               disabled={loading}
-              className="w-full px-3 py-2.5 rounded-xl bg-white/8 border border-white/12 text-white text-sm focus:outline-none focus:border-orange-400/60 disabled:opacity-50 transition-all appearance-none cursor-pointer"
+              className="w-full px-3 py-2.5 rounded-xl bg-white/8 border border-white/12 text-white text-sm focus:outline-none focus:border-violet-400/60 disabled:opacity-50 transition-all appearance-none cursor-pointer"
               style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff60' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center", backgroundSize: "16px" }}
             >
               {GRANT_TYPES.map((g) => (
@@ -112,6 +114,21 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onCre
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Company Website */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-white/60 text-xs font-medium uppercase tracking-wider">
+              Company Website <span className="text-white/30">(optional)</span>
+            </label>
+            <input
+              type="url"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              placeholder="https://yourcompany.com"
+              disabled={loading}
+              className="w-full px-3 py-2.5 rounded-xl bg-white/8 border border-white/12 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-violet-400/60 focus:bg-white/10 disabled:opacity-50 transition-all"
+            />
           </div>
 
           {/* Description */}
@@ -125,7 +142,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onCre
               placeholder="Brief notes about this application…"
               rows={3}
               disabled={loading}
-              className="w-full px-3 py-2.5 rounded-xl bg-white/8 border border-white/12 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-orange-400/60 disabled:opacity-50 resize-none transition-all"
+              className="w-full px-3 py-2.5 rounded-xl bg-white/8 border border-white/12 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-violet-400/60 disabled:opacity-50 resize-none transition-all"
             />
           </div>
         </div>
@@ -138,7 +155,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onCre
         {/* Loading step label */}
         {loading && (
           <div className="flex items-center gap-2 text-white/50 text-sm">
-            <Loader2 className="w-4 h-4 animate-spin text-orange-400" />
+            <Loader2 className="w-4 h-4 animate-spin text-violet-400" />
             <span>{stepLabel}</span>
           </div>
         )}
@@ -155,7 +172,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onCre
           <button
             onClick={handleCreate}
             disabled={loading || !name.trim()}
-            className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 text-white text-sm font-semibold hover:from-orange-400 hover:to-pink-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+            className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-semibold hover:from-purple-400 hover:to-blue-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
             {loading ? "Creating…" : "Create Project"}

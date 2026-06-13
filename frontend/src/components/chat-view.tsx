@@ -3,17 +3,10 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Rocket, ArrowUp, Square, Copy, ThumbsUp, ThumbsDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { LiquidButton } from "@/components/ui/liquid-glass-button";
+import { useSession } from "next-auth/react";
 import type { Message } from "@/lib/chat-store";
 
 const API = "https://web-production-27a7b.up.railway.app";
-
-const SUGGESTIONS = [
-  "Help me validate my startup idea",
-  "Draft a go-to-market strategy for my product",
-  "What should my MVP include?",
-  "How do I pitch this to investors?",
-];
 
 // ── Input box ──────────────────────────────────────────────────────────────────
 
@@ -111,7 +104,7 @@ const AssistantMessage: React.FC<{ msg: Message }> = ({ msg }) => {
       transition={{ duration: 0.25 }}
       className="flex gap-3 group"
     >
-      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-md">
+      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-md">
         <Rocket className="w-3.5 h-3.5 text-white" />
       </div>
       <div className="flex-1 min-w-0">
@@ -151,7 +144,7 @@ const AssistantMessage: React.FC<{ msg: Message }> = ({ msg }) => {
 
 const ThinkingDots: React.FC = () => (
   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3">
-    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center flex-shrink-0">
+    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
       <Rocket className="w-3.5 h-3.5 text-white" />
     </div>
     <div className="flex items-center gap-1 pt-2">
@@ -175,6 +168,10 @@ interface ChatViewProps {
 }
 
 export const ChatView: React.FC<ChatViewProps> = ({ chatId, initialMessages, onMessagesChange }) => {
+  const { data: session } = useSession();
+  const rawFirstName = (session?.user?.name || "entrepreneur").split(" ")[0];
+  const firstName = rawFirstName.charAt(0).toUpperCase() + rawFirstName.slice(1);
+
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput]       = useState("");
   const [isLoading, setLoading] = useState(false);
@@ -254,52 +251,56 @@ export const ChatView: React.FC<ChatViewProps> = ({ chatId, initialMessages, onM
         style={{ opacity: hasMessages ? 1 : 0 }}
       />
 
+      {/* Glowing landing-page background — two distinct aura blobs that roam
+          the screen on independent paths for a random-looking motion. The
+          outer div fades the whole thing out once a conversation starts. */}
+      <div
+        className="absolute inset-0 overflow-hidden pointer-events-none transition-opacity duration-700"
+        style={{ opacity: hasMessages ? 0 : 1 }}
+      >
+        {/* Blob A — tall purple shape, lives on the LEFT side */}
+        <div
+          className="absolute left-[2%] top-[28%] h-[55vh] w-[38vw] rounded-full animate-[auraFloatA_19s_ease-in-out_infinite]"
+          style={{
+            filter: "blur(70px)",
+            background:
+              "radial-gradient(closest-side, rgba(140,95,250,0.55) 0%, rgba(120,90,240,0.22) 55%, transparent 100%)",
+          }}
+        />
+        {/* Blob B — wide blue shape, lives on the RIGHT side */}
+        <div
+          className="absolute left-[56%] top-[40%] h-[42vh] w-[48vw] rounded-full animate-[auraFloatB_26s_ease-in-out_infinite]"
+          style={{
+            filter: "blur(80px)",
+            background:
+              "radial-gradient(closest-side, rgba(70,115,245,0.50) 0%, rgba(60,100,230,0.20) 55%, transparent 100%)",
+          }}
+        />
+      </div>
+
       <div className="relative z-10 flex flex-col h-full">
         <AnimatePresence mode="wait">
           {!hasMessages ? (
             <motion.div
               key="empty"
-              className="flex-1 flex flex-col items-center justify-center px-4 pb-6"
+              className="flex-1 flex flex-col items-center justify-center px-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0, y: -16, transition: { duration: 0.25 } }}
             >
-              <div className="w-full max-w-[560px] flex flex-col items-center gap-7">
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-14 h-14 rounded-2xl bg-black/20 backdrop-blur-sm border border-black/10 flex items-center justify-center shadow-xl">
-                    <Rocket className="w-7 h-7 text-white drop-shadow" />
-                  </div>
-                  <div className="text-center">
-                    <h1 className="text-white text-2xl font-semibold tracking-tight">
-                      How can I help you?
-                    </h1>
-                    <p className="text-white/55 text-sm mt-1">
-                      Your AI cofounder for building startups
-                    </p>
-                  </div>
-                </div>
+              <div className="w-full max-w-[720px] mx-auto flex flex-col items-center text-center gap-8">
+                <h1 className="text-5xl sm:text-6xl font-medium tracking-tight bg-gradient-to-b from-white to-white/55 bg-clip-text text-transparent">
+                  Hello, {firstName}!
+                </h1>
 
-                <div className="w-full">
+                <div className="w-full max-w-[680px] mx-auto">
                   <InputBox
                     value={input}
                     onChange={setInput}
                     onSend={() => sendMessage(input)}
                     isLoading={isLoading}
-                    dark={false}
+                    dark={true}
                   />
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 w-full">
-                  {SUGGESTIONS.map((s) => (
-                    <LiquidButton
-                      key={s}
-                      onClick={() => sendMessage(s)}
-                      size="default"
-                      className="block w-full h-auto rounded-xl px-3.5 py-3 text-left whitespace-normal text-white/70 hover:text-white text-xs font-normal leading-relaxed"
-                    >
-                      {s}
-                    </LiquidButton>
-                  ))}
                 </div>
               </div>
             </motion.div>

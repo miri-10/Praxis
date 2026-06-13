@@ -4,10 +4,45 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ── Söhne (the typeface ChatGPT uses) ────────────────────────────────────────
+   Söhne is a licensed font from Klim Type Foundry and cannot be bundled here.
+   Drop the purchased .woff2 files into frontend/public/fonts/ (see the README
+   there) and these @font-face rules will pick them up automatically. Until then
+   the app falls back to the same system stack ChatGPT uses, which looks nearly
+   identical. */
+@font-face {
+  font-family: "Söhne";
+  src: url("/fonts/soehne-buch.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Söhne";
+  src: url("/fonts/soehne-kraftig.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Söhne";
+  src: url("/fonts/soehne-halbfett.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Söhne";
+  src: url("/fonts/soehne-dreiviertelfett.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: "Söhne", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -135,5 +170,48 @@
   }
   to {
     background-position: 0% -1000%;
+  }
+}
+
+/* Two aura blobs that each stay on their own side of the screen — A on the
+   left, B on the right — but swing toward the center at one waypoint so they
+   occasionally overlap and mix, then drift back apart. Different durations +
+   offset "meet" timings keep the mixing from looking like a synced loop.
+   Translation uses vw/vh so the blobs actually travel across the screen. */
+@keyframes auraFloatA {
+  0% {
+    transform: translate(0vw, -4vh) scale(1);
+  }
+  25% {
+    transform: translate(7vw, 16vh) scale(1.15);
+  }
+  50% {
+    /* swings toward the center to mix with blob B */
+    transform: translate(24vw, 4vh) scale(1.1);
+  }
+  75% {
+    transform: translate(5vw, 20vh) scale(0.95);
+  }
+  100% {
+    transform: translate(0vw, -4vh) scale(1);
+  }
+}
+
+@keyframes auraFloatB {
+  0% {
+    transform: translate(0vw, 6vh) scale(1.1);
+  }
+  30% {
+    transform: translate(-9vw, -6vh) scale(0.9);
+  }
+  55% {
+    /* swings toward the center to mix with blob A */
+    transform: translate(-26vw, 8vh) scale(1.22);
+  }
+  80% {
+    transform: translate(-5vw, -2vh) scale(1);
+  }
+  100% {
+    transform: translate(0vw, 6vh) scale(1.1);
   }
 }
