@@ -1,20 +1,18 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { Scale, ArrowUp, Square, Copy, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Rocket, ArrowUp, Square, Copy, ThumbsUp, ThumbsDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import type { Message } from "@/lib/chat-store";
 
 const API = "https://web-production-27a7b.up.railway.app";
 
-const GRADIENT =
-  "radial-gradient(125% 125% at 50% 101%, rgba(245,87,2,1) 10.5%, rgba(245,120,2,1) 16%, rgba(245,140,2,1) 17.5%, rgba(245,170,100,1) 25%, rgba(238,174,202,1) 40%, rgba(202,179,214,1) 65%, rgba(148,201,233,1) 100%)";
-
 const SUGGESTIONS = [
-  "How do I register a private firm in Nepal?",
-  "What does FITTA 2019 say about foreign investment?",
-  "Explain the Industrial Business Act 2076",
-  "Consumer Protection Act 2075 — key rights",
+  "Help me validate my startup idea",
+  "Draft a go-to-market strategy for my product",
+  "What should my MVP include?",
+  "How do I pitch this to investors?",
 ];
 
 // ── Input box ──────────────────────────────────────────────────────────────────
@@ -58,7 +56,7 @@ const InputBox: React.FC<InputBoxProps> = ({ value, onChange, onSend, isLoading,
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKey}
-        placeholder="Ask a legal question about Nepal startup law…"
+        placeholder="Ask your cofounder anything — ideas, strategy, product…"
         rows={1}
         disabled={isLoading}
         className={`flex-1 resize-none bg-transparent text-sm leading-relaxed focus:outline-none disabled:opacity-50 ${
@@ -114,7 +112,7 @@ const AssistantMessage: React.FC<{ msg: Message }> = ({ msg }) => {
       className="flex gap-3 group"
     >
       <div className="w-7 h-7 rounded-full bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-md">
-        <Scale className="w-3.5 h-3.5 text-white" />
+        <Rocket className="w-3.5 h-3.5 text-white" />
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-white/82 text-sm leading-[1.75] whitespace-pre-wrap">{msg.content}</p>
@@ -154,7 +152,7 @@ const AssistantMessage: React.FC<{ msg: Message }> = ({ msg }) => {
 const ThinkingDots: React.FC = () => (
   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3">
     <div className="w-7 h-7 rounded-full bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center flex-shrink-0">
-      <Scale className="w-3.5 h-3.5 text-white" />
+      <Rocket className="w-3.5 h-3.5 text-white" />
     </div>
     <div className="flex items-center gap-1 pt-2">
       {[0, 1, 2].map((i) => (
@@ -249,11 +247,8 @@ export const ChatView: React.FC<ChatViewProps> = ({ chatId, initialMessages, onM
 
   return (
     <div className="relative flex-1 flex flex-col h-full overflow-hidden">
-      {/* Background: gradient fades to black when chatting */}
-      <div
-        className="absolute inset-0 pointer-events-none transition-opacity duration-700"
-        style={{ opacity: hasMessages ? 0 : 1, background: GRADIENT }}
-      />
+      {/* Reading area fades to dark when chatting; the full-screen
+          custom background (in page.tsx) shows through otherwise */}
       <div
         className="absolute inset-0 pointer-events-none bg-[#0a0a0a] transition-opacity duration-700"
         style={{ opacity: hasMessages ? 1 : 0 }}
@@ -272,14 +267,14 @@ export const ChatView: React.FC<ChatViewProps> = ({ chatId, initialMessages, onM
               <div className="w-full max-w-[560px] flex flex-col items-center gap-7">
                 <div className="flex flex-col items-center gap-3">
                   <div className="w-14 h-14 rounded-2xl bg-black/20 backdrop-blur-sm border border-black/10 flex items-center justify-center shadow-xl">
-                    <Scale className="w-7 h-7 text-white drop-shadow" />
+                    <Rocket className="w-7 h-7 text-white drop-shadow" />
                   </div>
                   <div className="text-center">
                     <h1 className="text-white text-2xl font-semibold tracking-tight">
                       How can I help you?
                     </h1>
                     <p className="text-white/55 text-sm mt-1">
-                      Ask legal questions about Nepal startup law
+                      Your AI cofounder for building startups
                     </p>
                   </div>
                 </div>
@@ -296,13 +291,14 @@ export const ChatView: React.FC<ChatViewProps> = ({ chatId, initialMessages, onM
 
                 <div className="grid grid-cols-2 gap-2 w-full">
                   {SUGGESTIONS.map((s) => (
-                    <button
+                    <LiquidButton
                       key={s}
                       onClick={() => sendMessage(s)}
-                      className="text-left px-3.5 py-3 rounded-xl bg-black/12 hover:bg-black/22 backdrop-blur-sm border border-black/10 hover:border-black/18 text-white/65 hover:text-white/90 text-xs leading-relaxed transition-all cursor-pointer"
+                      size="default"
+                      className="block w-full h-auto rounded-xl px-3.5 py-3 text-left whitespace-normal text-white/70 hover:text-white text-xs font-normal leading-relaxed"
                     >
                       {s}
-                    </button>
+                    </LiquidButton>
                   ))}
                 </div>
               </div>
@@ -339,7 +335,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ chatId, initialMessages, onM
                     dark={true}
                   />
                   <p className="text-center text-white/18 text-[10px]">
-                    Grounded in Nepal legal documents · Always consult a qualified lawyer
+                    Your AI cofounder · Brainstorm, strategize, and build together
                   </p>
                 </div>
               </div>

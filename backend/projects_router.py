@@ -37,12 +37,17 @@ logger = logging.getLogger(__name__)
 _raw_url = os.getenv("SUPABASE_URL", "").rstrip("/").removesuffix("/rest/v1")
 _svc_key = os.getenv("SUPABASE_SERVICE_KEY", "")
 
-if not _raw_url or not _svc_key:
-    raise RuntimeError(
-        "SUPABASE_URL and SUPABASE_SERVICE_KEY must be set in backend/.env"
+# Do NOT crash the whole app at import if Supabase isn't configured — the core
+# /ask chat endpoint doesn't need it. Project / saved-chat / file endpoints will
+# return 503 until SUPABASE_URL and SUPABASE_SERVICE_KEY are provided (as Railway
+# environment variables in production, or in backend/.env locally).
+supabase: Optional[Client] = None
+if _raw_url and _svc_key:
+    supabase = create_client(_raw_url, _svc_key)
+else:
+    logger.error(
+        "SUPABASE_URL / SUPABASE_SERVICE_KEY not set — project endpoints disabled."
     )
-
-supabase: Client = create_client(_raw_url, _svc_key)
 
 # Storage bucket where uploaded project files are stored
 STORAGE_BUCKET = "praxis-files"

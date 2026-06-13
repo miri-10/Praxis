@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Praxis — Nepal Legal AI",
-  description: "Ask legal questions about Nepal startup law in Nepali or English.",
+  title: "Praxis — Your AI Cofounder",
+  description: "Brainstorm ideas, shape strategy, and build your startup with an AI cofounder.",
 };
 
 export default function RootLayout({
@@ -26,7 +26,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="h-full overflow-hidden">
         <Providers>{children}</Providers>

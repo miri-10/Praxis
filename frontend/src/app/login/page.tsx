@@ -1,7 +1,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { Scale } from "lucide-react";
+import { Rocket } from "lucide-react";
 
 export default function LoginPage() {
   return (
@@ -10,11 +10,11 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="flex flex-col items-center gap-4">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center shadow-2xl shadow-orange-500/25">
-            <Scale className="w-8 h-8 text-white" />
+            <Rocket className="w-8 h-8 text-white" />
           </div>
           <div className="text-center">
             <h1 className="text-white text-2xl font-semibold tracking-tight">Praxis</h1>
-            <p className="text-white/45 text-sm mt-1">Nepal Legal AI for Startups</p>
+            <p className="text-white/45 text-sm mt-1">Your AI Cofounder</p>
           </div>
         </div>
 
@@ -23,7 +23,7 @@ export default function LoginPage() {
           <div className="text-center">
             <h2 className="text-white font-medium">Sign in to continue</h2>
             <p className="text-white/35 text-xs mt-1">
-              Access legal documents, projects, and grants
+              Brainstorm ideas, plan projects, and grow your startup
             </p>
           </div>
 
@@ -54,9 +54,9 @@ export default function LoginPage() {
         </div>
 
         <p className="text-white/20 text-[11px] text-center">
-          By signing in you agree to use this app for lawful purposes only.
+          By signing in you agree to our terms of service.
           <br />
-          Always consult a qualified lawyer for legal advice.
+          Praxis is an AI assistant — review its suggestions before acting.
         </p>
       </div>
     </div>

@@ -3,10 +3,12 @@
 import React from "react";
 import {
   MessageSquare, FolderOpen, Award, Bookmark,
-  Bell, Plus, Search, PanelLeftClose, PanelLeft, Scale,
+  Bell, Plus, Search, PanelLeftClose, PanelLeft, Rocket,
   Trash2, LogIn, LogOut,
 } from "lucide-react";
 import { useSession, signIn, signOut } from "next-auth/react";
+import { GlassFilter } from "@/components/ui/liquid-glass";
+import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import type { Chat } from "@/lib/chat-store";
 
 const cn = (...cls: (string | undefined | null | false)[]) => cls.filter(Boolean).join(" ");
@@ -66,7 +68,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { data: session } = useSession();
 
   const navItems = [
-    { id: "chat",          label: "Legal Chat",   icon: <MessageSquare className="w-4 h-4" /> },
+    { id: "chat",          label: "Cofounder Chat", icon: <MessageSquare className="w-4 h-4" /> },
     { id: "projects",      label: "Projects",      icon: <FolderOpen    className="w-4 h-4" /> },
     { id: "grants",        label: "Grants",        icon: <Award         className="w-4 h-4" /> },
     { id: "saved",         label: "Saved Chats",   icon: <Bookmark      className="w-4 h-4" /> },
@@ -83,21 +85,51 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <aside
       className={cn(
-        "flex flex-col h-full border-r border-white/8 bg-black/50 backdrop-blur-2xl transition-all duration-300 flex-shrink-0",
+        "relative flex flex-col h-full border-r border-white/10 overflow-hidden transition-all duration-300 flex-shrink-0",
         collapsed ? "w-[60px]" : "w-[260px]"
       )}
     >
+      {/* Liquid-glass distortion filter (renders nothing visible) */}
+      <GlassFilter />
+
+      {/* Liquid-glass layers — frosted/refracted panel behind the content */}
+      <div
+        aria-hidden
+        className="absolute inset-0 z-0 pointer-events-none"
+        style={{
+          backdropFilter: "blur(3px)",
+          WebkitBackdropFilter: "blur(3px)",
+          filter: "url(#glass-distortion)",
+          isolation: "isolate",
+        }}
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 z-0 pointer-events-none"
+        style={{ background: "rgba(255, 255, 255, 0.1)" }}
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 z-0 pointer-events-none"
+        style={{
+          boxShadow:
+            "inset 2px 2px 1px 0 rgba(255, 255, 255, 0.4), inset -1px -1px 1px 1px rgba(255, 255, 255, 0.2)",
+        }}
+      />
+
+      {/* Sidebar content (unchanged) */}
+      <div className="relative z-30 flex flex-col h-full min-h-0">
       {/* Logo */}
       <div className="flex items-center justify-between px-3 py-4 border-b border-white/8 flex-shrink-0">
         {!collapsed ? (
           <>
             <div className="flex items-center gap-2.5">
               <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center flex-shrink-0">
-                <Scale className="w-4 h-4 text-white" />
+                <Rocket className="w-4 h-4 text-white" />
               </div>
               <div className="leading-tight">
                 <p className="text-white font-semibold text-sm tracking-wide">Praxis</p>
-                <p className="text-white/35 text-[10px]">Nepal Legal AI</p>
+                <p className="text-white/35 text-[10px]">AI Cofounder</p>
               </div>
             </div>
             <div className="flex items-center gap-0.5">
@@ -111,7 +143,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </>
         ) : (
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center mx-auto">
-            <Scale className="w-4 h-4 text-white" />
+            <Rocket className="w-4 h-4 text-white" />
           </div>
         )}
       </div>
@@ -128,16 +160,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* New Chat */}
       <div className={cn("px-2 pt-3 flex-shrink-0", collapsed && "flex justify-center")}>
-        <button
+        <LiquidButton
           onClick={onNewChat}
+          size="default"
           className={cn(
-            "flex items-center gap-2.5 rounded-xl bg-white/8 hover:bg-white/12 border border-white/10 hover:border-white/18 text-white text-sm font-medium transition-all active:scale-[0.98]",
-            collapsed ? "p-2" : "w-full px-3 py-2"
+            "rounded-xl text-white text-sm font-medium",
+            collapsed ? "w-auto p-2" : "w-full px-3 py-2"
           )}
         >
-          <Plus className="w-4 h-4 flex-shrink-0" />
-          {!collapsed && <span>New Chat</span>}
-        </button>
+          <span className="flex items-center gap-2.5">
+            <Plus className="w-4 h-4 flex-shrink-0" />
+            {!collapsed && <span>New Chat</span>}
+          </span>
+        </LiquidButton>
       </div>
 
       {/* Nav */}
@@ -273,6 +308,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {!collapsed && <span className="text-sm">Sign in with Google</span>}
           </button>
         )}
+      </div>
       </div>
     </aside>
   );

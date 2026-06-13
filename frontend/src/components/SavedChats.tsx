@@ -60,7 +60,7 @@ export const SavedChats: React.FC<SavedChatsProps> = ({ projectId }) => {
         </div>
         <p className="text-white/50 text-sm font-medium">No saved answers yet</p>
         <p className="text-white/30 text-xs text-center max-w-xs">
-          Save answers from Legal Chat to see them here.
+          Save answers from Cofounder Chat to see them here.
         </p>
       </div>
     );
