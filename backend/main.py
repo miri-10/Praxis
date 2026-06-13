@@ -36,8 +36,7 @@ from projects_router import router as projects_router
 # ── Paths ─────────────────────────────────────────────────────────────────────
 
 SCRIPT_DIR   = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
-CHROMA_DIR   = os.path.join(PROJECT_ROOT, "chroma_db")
+CHROMA_DIR   = os.path.join(SCRIPT_DIR, "chroma_db")
 LOG_FILE     = os.path.join(SCRIPT_DIR, "errors.log")
 
 # ── Logging ───────────────────────────────────────────────────────────────────
