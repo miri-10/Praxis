@@ -1,4 +1,4 @@
-const BASE = "https://web-production-27a7b.up.railway.app";
+const BASE = process.env.NEXT_PUBLIC_API_URL || "https://web-production-27a7b.up.railway.app";
 
 async function apiFetch(path, options = {}) {
   const isFormData = options.body instanceof FormData;

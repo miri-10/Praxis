@@ -3,9 +3,11 @@
 import React from "react";
 import {
   MessageSquare, FolderOpen, Award, Bookmark,
-  Bell, Plus, Search, PanelLeftClose, PanelLeft, Rocket,
+  Bell, Plus, Search, PanelLeftClose, PanelLeft,
   Trash2, LogIn, LogOut,
 } from "lucide-react";
+import Image from "next/image";
+import logo from "@/photo/logo.png";
 import { useSession, signIn, signOut } from "next-auth/react";
 import type { Chat } from "@/lib/chat-store";
 
@@ -94,8 +96,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {!collapsed ? (
           <>
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
-                <Rocket className="w-4 h-4 text-white" />
+              <div className="flex-shrink-0 rounded-lg overflow-hidden">
+                <Image src={logo} alt="Praxis" width={28} height={28} className="object-contain" />
               </div>
               <div className="leading-tight">
                 <p className="text-white font-semibold text-sm tracking-wide">Praxis</p>
@@ -112,8 +114,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           </>
         ) : (
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center mx-auto">
-            <Rocket className="w-4 h-4 text-white" />
+          <div className="rounded-lg overflow-hidden mx-auto">
+            <Image src={logo} alt="Praxis" width={28} height={28} className="object-contain" />
           </div>
         )}
       </div>

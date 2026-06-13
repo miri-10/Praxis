@@ -1,12 +1,17 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { Rocket, ArrowUp, Square, Copy, ThumbsUp, ThumbsDown } from "lucide-react";
+import { ArrowUp, Square, Copy, ThumbsUp, ThumbsDown, Bookmark, Check, Loader2 } from "lucide-react";
+import Image from "next/image";
+import logo from "@/photo/logo.png";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";
 import type { Message } from "@/lib/chat-store";
+import { listProjects, saveChat } from "@/lib/api";
+import { addSave } from "@/lib/saved-store";
 
-const API = "https://web-production-27a7b.up.railway.app";
+const API = process.env.NEXT_PUBLIC_API_URL || "https://web-production-27a7b.up.railway.app";
 
 // ── Input box ──────────────────────────────────────────────────────────────────
 
@@ -95,8 +100,157 @@ const UserMessage: React.FC<{ msg: Message }> = ({ msg }) => (
   </motion.div>
 );
 
-const AssistantMessage: React.FC<{ msg: Message }> = ({ msg }) => {
+// ── Save modal ─────────────────────────────────────────────────────────────────
+
+interface SaveModalProps {
+  question: string;
+  answer: string;
+  sources: string[];
+  onClose: () => void;
+  onSaved: () => void;
+}
+
+function SaveModal({ question, answer, sources, onClose, onSaved }: SaveModalProps) {
+  const [saveGlobal, setSaveGlobal] = useState(true);
+  const [projects, setProjects]     = useState<{ id: string; name: string }[]>([]);
+  const [selected, setSelected]     = useState<Set<string>>(new Set());
+  const [loadingProjects, setLoadingProjects] = useState(true);
+  const [saving, setSaving]         = useState(false);
+
+  useEffect(() => {
+    listProjects()
+      .then((raw: { id: string; name: string }[]) => setProjects(Array.isArray(raw) ? raw : []))
+      .catch(() => setProjects([]))
+      .finally(() => setLoadingProjects(false));
+  }, []);
+
+  const toggleProject = (id: string) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      if (saveGlobal) addSave({ question, answer, sources });
+      if (selected.size > 0) {
+        await Promise.all(
+          [...selected].map((id) => saveChat(id, { question, answer, sources }).catch(() => null))
+        );
+      }
+    } finally {
+      onSaved();
+      onClose();
+    }
+  };
+
+  const canSave = saveGlobal || selected.size > 0;
+
+  const CheckBox = ({ on }: { on: boolean }) => (
+    <div className={`w-4 h-4 rounded flex-shrink-0 flex items-center justify-center border transition-colors ${
+      on ? "bg-violet-500 border-violet-500" : "border-white/25"
+    }`}>
+      {on && <Check className="w-2.5 h-2.5 text-white" />}
+    </div>
+  );
+
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/60" onClick={!saving ? onClose : undefined} />
+      <div className="relative w-full max-w-sm rounded-2xl border border-white/[0.1] bg-[#1c1d21] shadow-2xl p-5 flex flex-col gap-4">
+        <h3 className="text-white font-semibold text-sm">Save response</h3>
+
+        {/* Saved Chats toggle */}
+        <button
+          onClick={() => setSaveGlobal(!saveGlobal)}
+          className={`flex items-center gap-3 p-3 rounded-xl border text-left w-full transition-all ${
+            saveGlobal
+              ? "border-violet-500/25 bg-violet-500/[0.08]"
+              : "border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06]"
+          }`}
+        >
+          <CheckBox on={saveGlobal} />
+          <div>
+            <p className="text-white text-sm font-medium">Saved Chats</p>
+            <p className="text-white/40 text-xs mt-0.5">Quick-access from the sidebar</p>
+          </div>
+        </button>
+
+        {/* Projects */}
+        <div className="flex flex-col gap-2">
+          <p className="text-white/30 text-[10px] font-semibold uppercase tracking-wider">
+            Also save to project
+          </p>
+          {loadingProjects ? (
+            <div className="flex items-center gap-2 text-white/30 text-xs py-1">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              Loading…
+            </div>
+          ) : projects.length === 0 ? (
+            <p className="text-white/25 text-xs py-1">
+              No projects yet — create one in the Projects tab.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-1 max-h-36 overflow-y-auto">
+              {projects.map((p) => {
+                const on = selected.has(p.id);
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => toggleProject(p.id)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left w-full transition-all ${
+                      on
+                        ? "border-violet-500/25 bg-violet-500/[0.08]"
+                        : "border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.05]"
+                    }`}
+                  >
+                    <CheckBox on={on} />
+                    <span className="text-white/80 text-sm truncate">{p.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-2 pt-1">
+          <button
+            onClick={onClose}
+            disabled={saving}
+            className="flex-1 py-2.5 rounded-xl border border-white/[0.1] text-white/55 text-sm hover:bg-white/[0.05] disabled:opacity-40 transition-all"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={!canSave || saving}
+            className="flex-1 py-2.5 rounded-xl bg-[#16131f] hover:bg-[#1e1a2e] border border-violet-500/20 hover:border-violet-400/35 text-white/80 hover:text-white text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+          >
+            {saving ? <><Loader2 className="w-4 h-4 animate-spin" />Saving…</> : "Save"}
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
+
+// ── Assistant message ──────────────────────────────────────────────────────────
+
+const AssistantMessage: React.FC<{ msg: Message; question: string }> = ({ msg, question }) => {
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [saved, setSaved]                = useState(false);
+
   const copy = () => navigator.clipboard.writeText(msg.content).catch(() => {});
+
+  const handleSaved = () => {
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -104,8 +258,8 @@ const AssistantMessage: React.FC<{ msg: Message }> = ({ msg }) => {
       transition={{ duration: 0.25 }}
       className="flex gap-3 group"
     >
-      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-md">
-        <Rocket className="w-3.5 h-3.5 text-white" />
+      <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 mt-0.5 shadow-md">
+        <Image src={logo} alt="Praxis" width={28} height={28} className="object-contain w-full h-full" />
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-white/82 text-sm leading-[1.75] whitespace-pre-wrap">{msg.content}</p>
@@ -122,30 +276,49 @@ const AssistantMessage: React.FC<{ msg: Message }> = ({ msg }) => {
           </div>
         )}
         <div className="flex items-center gap-0.5 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          {[
-            { icon: <Copy className="w-3.5 h-3.5" />, label: "Copy", fn: copy },
-            { icon: <ThumbsUp className="w-3.5 h-3.5" />, label: "Good", fn: () => {} },
-            { icon: <ThumbsDown className="w-3.5 h-3.5" />, label: "Bad", fn: () => {} },
-          ].map((b) => (
-            <button
-              key={b.label}
-              title={b.label}
-              onClick={b.fn}
-              className="p-1.5 rounded-lg text-white/30 hover:text-white/65 hover:bg-white/8 transition-colors"
-            >
-              {b.icon}
-            </button>
-          ))}
+          <button title="Copy" onClick={copy}
+            className="p-1.5 rounded-lg text-white/30 hover:text-white/65 hover:bg-white/8 transition-colors">
+            <Copy className="w-3.5 h-3.5" />
+          </button>
+          <button title="Good response" onClick={() => {}}
+            className="p-1.5 rounded-lg text-white/30 hover:text-white/65 hover:bg-white/8 transition-colors">
+            <ThumbsUp className="w-3.5 h-3.5" />
+          </button>
+          <button title="Bad response" onClick={() => {}}
+            className="p-1.5 rounded-lg text-white/30 hover:text-white/65 hover:bg-white/8 transition-colors">
+            <ThumbsDown className="w-3.5 h-3.5" />
+          </button>
+          <button
+            title={saved ? "Saved!" : "Save response"}
+            onClick={() => !saved && setShowSaveModal(true)}
+            className={`p-1.5 rounded-lg transition-colors ${
+              saved
+                ? "text-violet-400"
+                : "text-white/30 hover:text-white/65 hover:bg-white/8"
+            }`}
+          >
+            <Bookmark className={`w-3.5 h-3.5 ${saved ? "fill-violet-400" : ""}`} />
+          </button>
         </div>
       </div>
+
+      {showSaveModal && (
+        <SaveModal
+          question={question}
+          answer={msg.content}
+          sources={msg.sources ?? []}
+          onClose={() => setShowSaveModal(false)}
+          onSaved={handleSaved}
+        />
+      )}
     </motion.div>
   );
 };
 
 const ThinkingDots: React.FC = () => (
   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3">
-    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
-      <Rocket className="w-3.5 h-3.5 text-white" />
+    <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0">
+      <Image src={logo} alt="Praxis" width={28} height={28} className="object-contain w-full h-full" />
     </div>
     <div className="flex items-center gap-1 pt-2">
       {[0, 1, 2].map((i) => (
@@ -314,11 +487,15 @@ export const ChatView: React.FC<ChatViewProps> = ({ chatId, initialMessages, onM
             >
               <div className="flex-1 overflow-y-auto min-h-0 px-4 py-6">
                 <div className="max-w-2xl mx-auto flex flex-col gap-6">
-                  {messages.map((msg) =>
+                  {messages.map((msg, i) =>
                     msg.role === "user" ? (
                       <UserMessage key={msg.id} msg={msg} />
                     ) : (
-                      <AssistantMessage key={msg.id} msg={msg} />
+                      <AssistantMessage
+                        key={msg.id}
+                        msg={msg}
+                        question={messages[i - 1]?.content ?? ""}
+                      />
                     )
                   )}
                   {isLoading && <ThinkingDots />}

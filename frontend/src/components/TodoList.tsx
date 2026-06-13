@@ -150,7 +150,7 @@ export const TodoList: React.FC<TodoListProps> = ({ projectId }) => {
         <button
           onClick={handleAdd}
           disabled={adding || !newTask.trim()}
-          className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-white/70 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center gap-1.5"
+          className="px-3 py-2 rounded-xl bg-[#16131f] hover:bg-[#1e1a2e] border border-violet-500/[0.18] hover:border-violet-400/30 text-white/55 hover:text-white/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center gap-1.5"
         >
           {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
         </button>

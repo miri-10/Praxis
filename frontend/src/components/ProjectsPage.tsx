@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { Plus, Folder, Loader2, CalendarDays, CheckSquare } from "lucide-react";
+import { Plus, Folder, Search, ChevronDown } from "lucide-react";
 import { listProjects, getTodos } from "@/lib/api";
 import { NewProjectModal } from "@/components/NewProjectModal";
 
@@ -12,18 +12,11 @@ const GRANT_LABELS: Record<string, string> = {
   general:           "General / Other",
 };
 
-const GRANT_COLORS: Record<string, string> = {
-  iedi_startup_loan: "bg-blue-500/15 text-blue-300 border-blue-400/20",
-  ysef_youth_fund:   "bg-emerald-500/15 text-emerald-300 border-emerald-400/20",
-  nrb_refinancing:   "bg-violet-500/15 text-violet-300 border-violet-400/20",
-  general:           "bg-white/8 text-white/55 border-white/12",
-};
-
 const STATUS_COLORS: Record<string, string> = {
-  in_progress: "bg-amber-400/12 text-amber-300 border-amber-400/20",
-  submitted:   "bg-blue-400/12 text-blue-300 border-blue-400/20",
-  approved:    "bg-emerald-400/12 text-emerald-300 border-emerald-400/20",
-  rejected:    "bg-red-400/12 text-red-300 border-red-400/20",
+  in_progress: "text-amber-400  bg-amber-400/10  border-amber-400/20",
+  submitted:   "text-blue-400   bg-blue-400/10   border-blue-400/20",
+  approved:    "text-emerald-400 bg-emerald-400/10 border-emerald-400/20",
+  rejected:    "text-red-400    bg-red-400/10    border-red-400/20",
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -33,8 +26,15 @@ const STATUS_LABELS: Record<string, string> = {
   rejected:    "Rejected",
 };
 
-const formatDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+function relativeTime(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  if (diff < 60_000)         return "just now";
+  if (diff < 3_600_000)      return `${Math.floor(diff / 60_000)}m ago`;
+  if (diff < 86_400_000)     return `${Math.floor(diff / 3_600_000)}h ago`;
+  if (diff < 86_400_000 * 2) return "yesterday";
+  if (diff < 86_400_000 * 7) return `${Math.floor(diff / 86_400_000)} days ago`;
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
 
 interface Project {
   id: string;
@@ -51,14 +51,67 @@ interface ProjectWithProgress extends Project {
 
 function SkeletonCard() {
   return (
-    <div className="rounded-2xl border border-white/8 bg-white/4 p-5 flex flex-col gap-3 animate-pulse">
-      <div className="h-4 bg-white/10 rounded w-3/4" />
-      <div className="flex gap-2">
-        <div className="h-5 bg-white/8 rounded-full w-24" />
-        <div className="h-5 bg-white/8 rounded-full w-20" />
+    <div className="rounded-xl border border-white/[0.07] bg-white/[0.03] p-5 flex flex-col gap-3 animate-pulse">
+      <div className="flex items-start justify-between gap-3">
+        <div className="h-4 bg-white/10 rounded w-2/3" />
+        <div className="h-5 bg-white/8 rounded-md w-20 flex-shrink-0" />
       </div>
-      <div className="h-3 bg-white/6 rounded w-1/2 mt-auto" />
+      <div className="h-3 bg-white/6 rounded w-1/3" />
+      <div className="h-3 bg-white/5 rounded w-1/4 mt-auto" />
     </div>
+  );
+}
+
+interface ProjectCardProps {
+  project: ProjectWithProgress;
+  onClick: () => void;
+}
+
+function ProjectCard({ project, onClick }: ProjectCardProps) {
+  const pct         = project.total > 0 ? Math.round((project.completed / project.total) * 100) : 0;
+  const statusColor = STATUS_COLORS[project.status] ?? STATUS_COLORS.in_progress;
+  const statusLabel = STATUS_LABELS[project.status] ?? project.status;
+  const grantLabel  = GRANT_LABELS[project.grant_type] ?? project.grant_type;
+
+  return (
+    <button
+      onClick={onClick}
+      className="group text-left rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] hover:border-white/[0.15] p-5 flex flex-col gap-3 transition-all duration-200 active:scale-[0.995]"
+    >
+      {/* Name + status badge */}
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="text-white font-semibold text-base leading-snug flex-1 min-w-0 truncate">
+          {project.name}
+        </h3>
+        <span className={`flex-shrink-0 text-[11px] font-medium px-2 py-0.5 rounded-md border ${statusColor}`}>
+          {statusLabel}
+        </span>
+      </div>
+
+      {/* Grant type */}
+      <p className="text-white/35 text-xs -mt-1">{grantLabel}</p>
+
+      {/* Progress bar */}
+      {project.total > 0 && (
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between text-[11px] text-white/30">
+            <span>{project.completed} / {project.total} docs</span>
+            <span>{pct}%</span>
+          </div>
+          <div className="h-0.5 rounded-full bg-white/10 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-white/40 transition-all"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Timestamp */}
+      <p className="text-white/25 text-xs mt-auto pt-1">
+        Updated {relativeTime(project.created_at)}
+      </p>
+    </button>
   );
 }
 
@@ -67,17 +120,16 @@ interface ProjectsPageProps {
 }
 
 export const ProjectsPage: React.FC<ProjectsPageProps> = ({ onSelectProject }) => {
-  const [projects, setProjects]   = useState<ProjectWithProgress[]>([]);
-  const [loading, setLoading]     = useState(true);
-  const [showModal, setShowModal] = useState(false);
+  const [projects,   setProjects]   = useState<ProjectWithProgress[]>([]);
+  const [loading,    setLoading]    = useState(true);
+  const [showModal,  setShowModal]  = useState(false);
+  const [search,     setSearch]     = useState("");
 
   const fetchProjects = useCallback(async () => {
     setLoading(true);
     try {
       const raw: Project[] = await listProjects();
       const list = Array.isArray(raw) ? raw : [];
-
-      // Fetch todo progress for each project in parallel
       const withProgress = await Promise.all(
         list.map(async (p) => {
           try {
@@ -99,107 +151,82 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({ onSelectProject }) =
 
   useEffect(() => { fetchProjects(); }, [fetchProjects]);
 
+  const filtered = search.trim()
+    ? projects.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
+    : projects;
+
   return (
     <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
-      {/* ── Header ── */}
-      <header className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#16171a] flex-shrink-0">
-        <div>
-          <h1 className="text-white font-semibold text-base">My Projects</h1>
-          <p className="text-white/40 text-xs">{projects.length} grant application{projects.length !== 1 ? "s" : ""}</p>
+      {/* ── Page header ── */}
+      <div className="flex-shrink-0 px-8 pt-8 pb-5">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-white font-semibold text-2xl tracking-tight">Projects</h1>
+          <div className="flex items-center gap-2.5">
+            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/[0.12] text-white/50 text-sm hover:bg-white/5 transition-colors">
+              Sort by <span className="text-white/80 font-medium">Last updated</span>
+              <ChevronDown className="w-3.5 h-3.5 text-white/40" />
+            </button>
+            <button
+              onClick={() => setShowModal(true)}
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-white hover:bg-white/90 text-[#0a0a0a] text-sm font-medium transition-all active:scale-95"
+            >
+              New project
+            </button>
+          </div>
         </div>
-        <button
-          onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-400 hover:to-blue-400 text-white text-sm font-semibold transition-all active:scale-95"
-        >
-          <Plus className="w-4 h-4" />
-          New Project
-        </button>
-      </header>
+
+        {/* Search bar */}
+        <div className="relative">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 pointer-events-none" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search projects..."
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/10 focus:outline-none text-white text-sm placeholder:text-white/30 transition-all"
+          />
+        </div>
+      </div>
 
       {/* ── Content ── */}
-      <div className="flex-1 overflow-y-auto min-h-0 px-5 py-6">
+      <div className="flex-1 overflow-y-auto min-h-0 px-8 pb-8">
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {[1, 2, 3, 4].map((i) => <SkeletonCard key={i} />)}
           </div>
         ) : projects.length === 0 ? (
-          /* Empty state */
-          <div className="flex flex-col items-center justify-center h-full gap-5 py-20">
-            <div className="w-16 h-16 rounded-2xl bg-white/8 border border-white/10 flex items-center justify-center">
-              <Folder className="w-7 h-7 text-white/30" />
+          <div className="flex flex-col items-center justify-center h-full gap-5 py-24">
+            <div className="w-14 h-14 rounded-2xl bg-white/[0.05] border border-white/10 flex items-center justify-center">
+              <Folder className="w-6 h-6 text-white/25" />
             </div>
             <div className="text-center">
-              <p className="text-white/70 font-semibold text-base">No projects yet</p>
-              <p className="text-white/35 text-sm mt-1">Track your grant applications in one place.</p>
+              <p className="text-white/70 font-semibold">No projects yet</p>
+              <p className="text-white/35 text-sm mt-1">Create a project to track your grant applications.</p>
             </div>
             <button
               onClick={() => setShowModal(true)}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-400 hover:to-blue-400 text-white text-sm font-semibold transition-all active:scale-95"
+              className="flex items-center gap-2 px-5 py-2 rounded-lg bg-white hover:bg-white/90 text-[#0a0a0a] text-sm font-medium transition-all active:scale-95"
             >
               <Plus className="w-4 h-4" />
-              Start your first grant application
+              New project
+            </button>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 gap-2">
+            <p className="text-white/50 text-sm">No projects match &ldquo;{search}&rdquo;</p>
+            <button onClick={() => setSearch("")} className="text-white/35 text-xs hover:text-white/60 transition-colors">
+              Clear search
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {projects.map((p) => {
-              const grantColor  = GRANT_COLORS[p.grant_type]  ?? GRANT_COLORS.general;
-              const statusColor = STATUS_COLORS[p.status]     ?? STATUS_COLORS.in_progress;
-              const pct = p.total > 0 ? Math.round((p.completed / p.total) * 100) : 0;
-
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => onSelectProject(p.id)}
-                  className="group text-left rounded-2xl border border-white/10 bg-white/4 hover:bg-white/7 hover:border-white/20 p-5 flex flex-col gap-3 cursor-pointer transition-all duration-200 active:scale-[0.99]"
-                >
-                  {/* Name */}
-                  <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-white font-semibold text-sm leading-snug flex-1">{p.name}</h3>
-                  </div>
-
-                  {/* Pills */}
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full border ${grantColor}`}>
-                      {GRANT_LABELS[p.grant_type] ?? p.grant_type}
-                    </span>
-                    <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full border ${statusColor}`}>
-                      {STATUS_LABELS[p.status] ?? p.status}
-                    </span>
-                  </div>
-
-                  {/* Progress */}
-                  {p.total > 0 && (
-                    <div className="flex flex-col gap-1.5">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5 text-white/45 text-xs">
-                          <CheckSquare className="w-3 h-3" />
-                          <span>{p.completed}/{p.total} docs</span>
-                        </div>
-                        <span className="text-white/30 text-xs">{pct}%</span>
-                      </div>
-                      <div className="h-1 rounded-full bg-white/10 overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all"
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Date */}
-                  <div className="flex items-center gap-1.5 text-white/30 text-xs mt-auto pt-1">
-                    <CalendarDays className="w-3 h-3" />
-                    <span>{formatDate(p.created_at)}</span>
-                  </div>
-                </button>
-              );
-            })}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {filtered.map((p) => (
+              <ProjectCard key={p.id} project={p} onClick={() => onSelectProject(p.id)} />
+            ))}
           </div>
         )}
       </div>
 
-      {/* Modal */}
       {showModal && (
         <NewProjectModal
           onClose={() => setShowModal(false)}

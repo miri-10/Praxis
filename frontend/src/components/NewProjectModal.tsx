@@ -64,8 +64,8 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onCre
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-              <FolderPlus className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-xl bg-violet-950/60 border border-violet-500/20 flex items-center justify-center">
+              <FolderPlus className="w-4 h-4 text-violet-300/80" />
             </div>
             <div>
               <h2 className="text-white font-semibold text-base">New Project</h2>
@@ -172,7 +172,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onCre
           <button
             onClick={handleCreate}
             disabled={loading || !name.trim()}
-            className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-semibold hover:from-purple-400 hover:to-blue-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+            className="flex-1 py-2.5 rounded-xl bg-[#16131f] hover:bg-[#1e1a2e] border border-violet-500/20 hover:border-violet-400/35 text-white/80 hover:text-white text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
             {loading ? "Creating…" : "Create Project"}

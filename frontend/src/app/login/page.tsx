@@ -1,7 +1,8 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { Rocket } from "lucide-react";
+import Image from "next/image";
+import logo from "@/photo/logo.png";
 
 export default function LoginPage() {
   return (
@@ -9,8 +10,8 @@ export default function LoginPage() {
       <div className="w-full max-w-sm flex flex-col items-center gap-8">
         {/* Logo */}
         <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-2xl shadow-purple-500/25">
-            <Rocket className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-2xl shadow-purple-500/25">
+            <Image src={logo} alt="Praxis" width={64} height={64} className="object-contain w-full h-full" />
           </div>
           <div className="text-center">
             <h1 className="text-white text-2xl font-semibold tracking-tight">Praxis</h1>
